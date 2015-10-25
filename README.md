@@ -1,3 +1,10 @@
-Opal environment with sprockets, slim, sass, and rails-assets.
+### Chess game written in ruby.
+Runs in browser using [Opal](http://opalrb.org/) 
+   
+   
+Run 
 
-Example code for blog [post](http://fazibear.github.io/blog/2015/04/29/having-fun-with-opal-and-sprockets/)
+    bundle install
+    rackup
+
+Open `localhost:9292`

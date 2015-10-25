@@ -1,0 +1,83 @@
+$light: #f0d9b5 
+$dark: #b58863
+$board-size: 320px
+
+
+.board
+  width: $board-size
+  height: $board-size
+  border: 1px solid #404040 
+  box-sizing: content-box
+.cell
+
+  -webkit-touch-callout: none
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+  
+  
+  width: 12.5%
+  height: 12.5%
+  float: left
+  position: relative
+  
+  background-position: 50% 50%
+  background-repeat: no-repeat
+  background-size: cover
+  
+  
+  &.white
+    background-color: $light 
+    color: $dark
+  &.black
+    background-color: $dark 
+    color: $light
+  &:nth-child(8n+1)
+    clear: both
+    
+    
+.selected
+  background-size: 120%
+  
+  
+.notation
+  cursor: default
+  opacity: 0.1
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  line-height: 100%
+  font-size: $board-size/10
+
+ 
+ 
+[data-piece='R']
+  background-image: url("wR.png")
+[data-piece='N']
+  background-image: url("wN.png")
+[data-piece='B']
+  background-image: url("wB.png")
+[data-piece='K']
+  background-image: url("wK.png")
+[data-piece='Q']
+  background-image: url("wQ.png")
+[data-piece='P']
+  background-image: url("wP.png")
+  
+[data-piece='r']
+  background-image: url("bR.png")
+[data-piece='n']
+  background-image: url("bN.png")
+[data-piece='b']
+  background-image: url("bB.png")
+[data-piece='k']
+  background-image: url("bK.png")
+[data-piece='q']
+  background-image: url("bQ.png")
+[data-piece='p']
+  background-image: url("bP.png")
+  
+  

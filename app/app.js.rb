@@ -59,10 +59,20 @@ class Game
   def cells_click_event
     @board.on(:click, '.cell') do |evt|
       @board.children.remove_class 'selected'
+      @board.children.remove_class 'target'
+
       evt.current_target.add_class 'selected'
       
       @click_idxs.push  evt.current_target.id.to_i
       @click_idxs.shift
+      
+      from =  @click_idxs.last
+      valid_moves =  @pm.select {|move| move.first == from}
+      target_idxs = valid_moves.map(&:last)
+      
+      cell_ids = '#' + target_idxs.join(',#')
+      Element[cell_ids].add_class 'target'
+      
       
       if @pm.include?  @click_idxs
         @position.move! *@click_idxs
@@ -70,6 +80,7 @@ class Game
         
         @click_idxs = [nil, nil]
         puts @position
+        @board.children.remove_class 'selected'
         
         update_board
       end

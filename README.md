@@ -1,5 +1,7 @@
 ### Chess.
 
+[DEMO](https://chess-opal-demo.herokuapp.com/)
+
 Features:
 
 * Written in ruby
@@ -13,7 +15,7 @@ Features:
 * [PGN](https://en.wikipedia.org/wiki/Portable_Game_Notation) and [FEN](https://en.wikipedia.org/wiki/Forsyth-Edwards_Notation) notations output
 * Import game from [FEN](https://en.wikipedia.org/wiki/Forsyth-Edwards_Notation) string
    
-Run: 
+Run localy: 
 
 ```sh
 $ git clone git@github.com:ll14m4n/chess-opalrb-example.git

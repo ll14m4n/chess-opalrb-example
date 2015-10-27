@@ -88,6 +88,8 @@ class Position
 
   def self.fen(fen)
     new.tap do |pos|
+      # add  moves counters if omited
+      fen += ' 0 1' if fen.split.size == 4 
       raise ArgumentError unless fen.split.size == 6
       bo,tu,ca,ep,hm,fm =fen.split
       raise ArgumentError unless
@@ -99,10 +101,10 @@ class Position
         row = row.gsub(/\d/) {|m| '-'*m.to_i}.chars.map(&:to_sym).unshift(nil).push(nil)
         raise ArgumentError, "Invalid FEN string: error in row #{i}" unless row.size ==  10
         row
-      }.map! {|i| i == :- ? nil : i}
+      }.map {|i| i == :- ? nil : i}
 
       pos.board.unshift(*[nil]*20).push(*[nil]*20)
-      raise ArgumentError, "Invalid FEN string: number of rows must equal #{8}" unless pos.board.size == 120
+      raise ArgumentError, "Invalid FEN string: number of rows must equal 8" unless pos.board.size == 120
 
       pos.white = tu == 'w'
       pos.castling = ca == '-' ? '' : ca
@@ -115,7 +117,7 @@ class Position
     end
   end
 
-  def self.empty
+  def self.empty               
     new
   end
 
@@ -190,69 +192,18 @@ class Position
 
   def in_check?
     return false unless @king_idx[@white]
-    under_attck?(@king_idx[@white])
+    under_attack?(@king_idx[@white])
   end
 
-  def under_attck?(to)
+  def under_attack?(to)
     PIECES[!@white].any? do |piece|
       find_from_for(piece, to: to ).any?
     end
   end
 
-  def pgn_move!(str)
-
-    froms =[]
-
-    if  m = str.match( /^
-                      (?<piece>[RNBQKP])?
-                      (?<file>[a-h])? 
-                      (?<rank>[1-8])?
-                      x?   
-                      (?<square>[a-h][1-8])
-                      (=?(?<promote>[RNBQ]))?
-                      \+?
-                      $/x )
-      piece = m[:piece] || :P
-      piece = piece.downcase unless @white
-      piece = piece.to_sym
-
-      if promote = m[:promote]
-        promote = promote.downcase unless @white
-        promote  = promote.to_sym
-      end
-
-      to = m[:square].to_idx
-
-      froms = find_from_for(piece, to: to)
-      froms = froms.select {|from| from.to_sq[0] == m[:file]} if m[:file]
-      froms = froms.select {|from| from.to_sq[1] == m[:rank]} if m[:rank]
-
-    elsif str == 'O-O' && @castling.include?(@white ? 'K':'k')
-      piece = (@white ? :K : :k)
-      to = (@white ? g1 : g8)
-      froms.push  (@white ? e1 : e8)
-    elsif  str == 'O-O-O' && @castling.include?(@white ? 'Q':'q')
-      piece = (@white ? :K : :k)
-      to = (@white ? c1 : c8)
-      froms.push  (@white ? e1 : e8)
-    else
-      raise ArgumentError, "move: #{str}\n#{self.to_s}"
-    end
-
-    # filter_moves_in_check(froms.map!{|from| [from,to,promote]}).map!(&:first)
-    moves = filter_moves_in_check(froms.map!{|from| [from,to,promote]})
-    froms = moves.map(&:first)
-
-    raise ArgumentError, "move: #{str}, froms: #{froms.map(&:to_sq)} \n#{self.to_s}" unless froms.size == 1
-
-    move!(froms[0],to, promote)
-
-  end
 
   def filter_moves_in_check(moves)
-
     moves.select do |from,to, promote|
-      piece = @board[from]
 
       # cant castle from check
       next if (from - to).abs == 2 && @board[from].king? && in_check?
@@ -263,15 +214,11 @@ class Position
       ! ahead.in_check?
     end
 
-    # m
   end
 
 
   def move!(from,to,promote =  nil, options = {transition: true})
-    # return nil unless possible_moves.include? [from,to,promote].compact
-    #  nil
 
-    # raise ArgumentError unless
     transition =  options[:transition]
 
     piece = @board[from]
@@ -305,11 +252,11 @@ class Position
     ### update position for transition  to next move
     ###
     lost_castling = ''
-    lost_castling << 'K' if from == h1 || to == h1
-    lost_castling << 'k' if from == h8 || to == h8
-    lost_castling << 'Q' if from == a1 || to == a1
-    lost_castling << 'q' if from == a8 || to == a8
-    lost_castling << (@white ? 'KQ' : 'kq') if from == (@white ? e1 : e8)
+    lost_castling += 'K' if from == h1 || to == h1
+    lost_castling += 'k' if from == h8 || to == h8
+    lost_castling += 'Q' if from == a1 || to == a1
+    lost_castling += 'q' if from == a8 || to == a8
+    lost_castling += (@white ? 'KQ' : 'kq') if from == (@white ? e1 : e8)
     @castling = @castling.delete lost_castling
 
     @en_passant = piece.pawn? && ((to-from) == (@white ? -20 : 20)) ? `Math.floor((to+from)/2)` : nil
@@ -350,11 +297,11 @@ class Position
             if to == (color ? g1 : g8) && @castling.include?((color ? 'K':'k'))
               res.push king_from unless @board[(color ? f1 : f8)] || # path is clear
                   # no castling THROUGH check and INTO  check
-                  under_attck?((color ? f1 : f8)) || under_attck?((color ? g1 : g8))
+                  under_attack?((color ? f1 : f8)) || under_attack?((color ? g1 : g8))
               # queen side
             elsif to == (color ? c1 : c8) && @castling.include?((color ? 'Q':'q'))
               res.push king_from unless @board[(color ? d1 : d8)] || @board[(color ? b1 : b8)] ||
-                  under_attck?(color ? d1 : d8) || under_attck?(color ? c1 : c8)
+                  under_attack?(color ? d1 : d8) || under_attack?(color ? c1 : c8)
             end
           end
         end
@@ -450,8 +397,6 @@ class Position
 
     # must get out of check & cant move into check
     filter_moves_in_check moves
-
-    # moves
   end
   def possible_moves_str
     possible_moves.map{|from,to,promote| move_to_san(from,to,promote)}.sort
@@ -464,10 +409,10 @@ class Position
     !in_check? && possible_moves.empty?
   end
   def draw?
-    stalemate? || !checkmate? && halfmove >= HALF_MOVES_LIMIT
+    stalemate? || !checkmate? && @half_move >= HALF_MOVES_LIMIT
   end
   def game_end?
-    possible_moves.empty? || halfmove >= HALF_MOVES_LIMIT
+    possible_moves.empty? || @half_move >= HALF_MOVES_LIMIT
   end
 
 

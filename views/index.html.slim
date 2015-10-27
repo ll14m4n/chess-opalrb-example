@@ -14,5 +14,17 @@ html
     link rel="icon" href="data:;base64,iVBORw0KGgo=" 
     /= favicon_tag 'images/favicon.ico'
   body
-    p#welcome Welcome
+    h2#heading Welcome
     
+    hr
+            
+    .stats 
+      label[for='fen'] FEN:
+      input#fen[type='text' readonly ]
+      
+      label[for='pgn'] PGN:
+      textarea#pgn[readonly]
+      
+      .btns                   
+        button.btn#new_game Start new game
+        button.btn#load_fen Load FEN   

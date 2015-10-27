@@ -1,6 +1,6 @@
 $light: #f0d9b5 
 $dark: #b58863
-$board-size: 320px
+$board-size: 500px
 
 
 .board
@@ -8,17 +8,18 @@ $board-size: 320px
   height: $board-size
   border: 1px solid #404040 
   box-sizing: content-box
-  background-color: #0776a0
-.cell
+  //background-color: #0776a0
+  background-color: #6AA054
+  
 
+.cell
   -webkit-touch-callout: none
   -webkit-user-select: none
   -khtml-user-select: none
   -moz-user-select: none
   -ms-user-select: none
   user-select: none
-  
-  
+
   width: 12.5%
   height: 12.5%
   float: left
@@ -27,7 +28,6 @@ $board-size: 320px
   background-position: 50% 50%
   background-repeat: no-repeat
   background-size: cover
-  
   
   &.white
     background-color: $light 
@@ -38,12 +38,12 @@ $board-size: 320px
   &:nth-child(8n+1)
     clear: both
     
-    
 .selected
   background-size: 120%
   
 .target
   border-radius: $board-size/21
+
   
 .notation
   cursor: default
@@ -54,8 +54,6 @@ $board-size: 320px
   transform: translate(-50%, -50%)
   line-height: 100%
   font-size: $board-size/10
-
- 
  
 [data-piece='R']
   background-image: url("wR.png")
